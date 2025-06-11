@@ -1,34 +1,33 @@
 #include "pd_position_controller_simple.h"
+#include <tf2/convert.h>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2/LinearMath/Matrix3x3.h>
+#include "vehicles/multirotor/api/MultirotorRpcLibClient.hpp"
+
 using namespace std::placeholders;
 
 bool PIDParams::load_from_rosparams(const std::shared_ptr<rclcpp::Node> nh)
 {
     bool found = true;
-
     found = found && nh->get_parameter("kp_x", kp_x);
     found = found && nh->get_parameter("kp_y", kp_y);
     found = found && nh->get_parameter("kp_z", kp_z);
     found = found && nh->get_parameter("kp_yaw", kp_yaw);
-
     found = found && nh->get_parameter("kd_x", kd_x);
     found = found && nh->get_parameter("kd_y", kd_y);
     found = found && nh->get_parameter("kd_z", kd_z);
     found = found && nh->get_parameter("kd_yaw", kd_yaw);
-
     found = found && nh->get_parameter("reached_thresh_xyz", reached_thresh_xyz);
     found = found && nh->get_parameter("reached_yaw_degrees", reached_yaw_degrees);
-
     return found;
 }
 
 bool DynamicConstraints::load_from_rosparams(const std::shared_ptr<rclcpp::Node> nh)
 {
     bool found = true;
-
     found = found && nh->get_parameter("max_vel_horz_abs", max_vel_horz_abs);
     found = found && nh->get_parameter("max_vel_vert_abs", max_vel_vert_abs);
     found = found && nh->get_parameter("max_yaw_rate_degree", max_yaw_rate_degree);
-
     return found;
 }
 
@@ -95,12 +94,19 @@ void PIDPositionController::airsim_odom_cb(const nav_msgs::msg::Odometry::Shared
     curr_position_.x = odom_msg->pose.pose.position.x;
     curr_position_.y = odom_msg->pose.pose.position.y;
     curr_position_.z = odom_msg->pose.pose.position.z;
-    curr_position_.yaw = utils::get_yaw_from_quat_msg(odom_msg->pose.pose.orientation);
+
+    // Replace get_yaw_from_quat_msg with direct tf2::Matrix3x3 usage:
+    tf2::Quaternion q(
+        odom_msg->pose.pose.orientation.x,
+        odom_msg->pose.pose.orientation.y,
+        odom_msg->pose.pose.orientation.z,
+        odom_msg->pose.pose.orientation.w);
+    tf2::Matrix3x3 m(q);
+    double roll, pitch, yaw;
+    m.getRPY(roll, pitch, yaw);
+    curr_position_.yaw = yaw;
 }
 
-// todo maintain internal representation as eigen vec?
-// todo check if low velocity if within thresh?
-// todo maintain separate errors for XY and Z
 void PIDPositionController::check_reached_goal()
 {
     double diff_xyz = sqrt((target_position_.x - curr_position_.x) * (target_position_.x - curr_position_.x) + (target_position_.y - curr_position_.y) * (target_position_.y - curr_position_.y) + (target_position_.z - curr_position_.z) * (target_position_.z - curr_position_.z));

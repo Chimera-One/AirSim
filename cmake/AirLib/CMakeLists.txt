@@ -5,13 +5,15 @@ LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../cmake-modules")
 INCLUDE("${CMAKE_CURRENT_LIST_DIR}/../cmake-modules/CommonSetup.cmake")
 CommonSetup()
 
-IncludeEigen()
+####IncludeEigen()
+find_package(Eigen3 REQUIRED)
 
 include_directories(
   ${AIRSIM_ROOT}/AirLib/
   ${AIRSIM_ROOT}/AirLib/include
   ${AIRSIM_ROOT}/MavLinkCom/include
   ${RPC_LIB_INCLUDES}
+  ${EIGEN3_INCLUDE_DIR}
 )
 
 file(GLOB_RECURSE ${PROJECT_NAME}_sources 
@@ -28,6 +30,8 @@ add_library(${PROJECT_NAME} STATIC ${${PROJECT_NAME}_sources})
 CommonTargetLink()
 target_link_libraries(${PROJECT_NAME} ${RPC_LIB})
 target_link_libraries(${PROJECT_NAME} MavLinkCom)
+
+
 
 #string(SUBSTRING ${CMAKE_STATIC_LINKER_FLAGS} 9 -1 "BUILD_PLATFORM")
 #find_package(Threads REQUIRED)

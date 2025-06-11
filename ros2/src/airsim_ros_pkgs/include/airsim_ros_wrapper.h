@@ -1,4 +1,4 @@
-#include "common/common_utils/StrictMode.hpp"
+﻿#include "common/common_utils/StrictMode.hpp"
 STRICT_MODE_OFF //todo what does this do?
 #ifndef RPCLIB_MSGPACK
 #define RPCLIB_MSGPACK clmdep_msgpack
@@ -37,7 +37,8 @@ STRICT_MODE_OFF //todo what does this do?
 #include <iostream>
 #include <math.h>
 #include <math_common.h>
-#include <mavros_msgs/msg/state.hpp>
+//#include <mavros_msgs/msg/state.hpp>
+//#include "mavros_msgs/msg/state.hpp"
 #include <nav_msgs/msg/odometry.hpp>
 #include <opencv2/opencv.hpp>
 #include <sensor_msgs/msg/camera_info.hpp>
@@ -51,10 +52,16 @@ STRICT_MODE_OFF //todo what does this do?
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <sensor_msgs/msg/range.hpp>
 #include <rosgraph_msgs/msg/clock.hpp>
-#include <std_srvs/srv/empty.hpp>
+//#include <std_srvs/srv/empty.hpp>
+//#include "std_srvs/srv/empty.hpp"
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <tf2/LinearMath/Quaternion.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+//#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2_ros/transform_listener.h>
+#include <tf2_ros/buffer.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h> // this is the standard one → not .hpp
+//#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>  // if available, otherwise implement missing conversions
+#include <tf2_eigen/tf2_eigen.hpp>
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
@@ -62,6 +69,7 @@ STRICT_MODE_OFF //todo what does this do?
 #include <tf2/convert.h>
 #include <unordered_map>
 #include <memory>
+#include <tf2_sensor_msgs/tf2_sensor_msgs.hpp>
 
     struct SimpleMatrix
 {
